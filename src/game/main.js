@@ -1,0 +1,7 @@
+class MainGame {
+  constructor() {
+  }
+
+  initGame() {
+  }
+}
