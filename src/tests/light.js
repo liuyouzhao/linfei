@@ -37,7 +37,7 @@
     objects: [ disc, rect ]
   });
 
-  var darkmask = new DarkMask({ lights: [light1, light2] });
+  var darkmask = new DarkMask({ lights: [light1, light2], color:'rgba(0, 0, 0, 0.9)' });
 
 //!START
 // ...
