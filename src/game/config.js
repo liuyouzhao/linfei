@@ -5,19 +5,27 @@ var __configs = {
   ],
   "charactorSize" : [
     // 50 width, 50 length
-    40
+    20
   ],
   "charactorSpeed" : [
-    1
+    5
+  ],
+  "charactorTurnSpeed" : [
+    0.1
   ],
   "charactorFlashPower" : [
-    1.9
+    180
+  ],
+  "renderQueueSize" : [
+    32
   ]
 }
 
-
 class Config {
   static getParam(key, arg) {
+    if(!__configs[key] || !__configs[key][arg]) {
+      throw "key " + key + " the " + arg + " is not exist, please check your config in config.js:1";
+    }
     return __configs[key][arg];
   }
 

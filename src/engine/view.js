@@ -1,4 +1,4 @@
-class View {
+class ViewPort {
   constructor(w, h) {
     this.w = w;
     this.h = h;
@@ -25,11 +25,25 @@ class View {
     this.offy = -this.y;
   }
 
-  cvt(point) {
+  convertToViewPosition(x, y) {
     var rt = {};
-    rt.x = point.x + this.offx;
-    rt.y = point.y + this.offy;
+    rt.x = x + this.offx;
+    rt.y = y + this.offy;
     return rt;
+  }
+
+  rectInsideView(lt, rb) {
+    if(lt.x > this.w || lt.y > this.h || rb.x < 0 || rb.y < 0) {
+         return false;
+    }
+    return true;
+  }
+
+  pointInsideView(x, y) {
+    if(x < 0 || x > this.w || y < 0 || y > this.h) {
+      return false;
+    }
+    return true;
   }
 
   getOffX() {

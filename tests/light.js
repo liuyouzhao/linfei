@@ -19,12 +19,15 @@
   var light2 = new Lamp({
     position: new Vec2(300, 50),
     color: '#CCF',
-    distance: 200,
+    distance: 300,
     radius: 10,
     samples: 150
   });
-  var disc = new DiscObject({ center: new Vec2(100, 100), radius: 30 });
-  var rect = new RectangleObject({ topleft: new Vec2(250, 200), bottomright: new Vec2(350, 250) });
+  var disc = new DiscObject({ center: new Vec2(400, 300), radius: 30 });
+  var rect = new RectangleObject({ topleft: new Vec2(50, 200), bottomright: new Vec2(750, 250) });
+  //var rect2 = new RectangleObject({ topleft: new Vec2(1050, 200), bottomright: new Vec2(450, 250) });
+  //var rect3 = new RectangleObject({ topleft: new Vec2(250, 200), bottomright: new Vec2(350, 250) });
+  //var rect4 = new RectangleObject({ topleft: new Vec2(250, 200), bottomright: new Vec2(350, 250) });
 
   var objects = [ disc, rect ];
 
@@ -50,10 +53,10 @@
     if (d == lastd) return; // nothing has changed
     lastd = d;
 
-    light1.position = new Vec2(200-d, 150+d);
+    //light1.position = new Vec2(200-d, 150+d);
     //light2.position = new Vec2(200+d, 150-d);
     light1.angle = 0.0;
-    light2.angle = d/10;
+    light2.angle = d/20;
     light1.roughness = 1.0;
     light2.roughness = 1.0;
 
@@ -73,7 +76,7 @@
     ctx.fill();
 
     ctx.globalCompositeOperation = "lighter";
-    lighting1.render(ctx);
+    //lighting1.render(ctx);
     lighting2.render(ctx);
 
     ctx.globalCompositeOperation = "source-over";

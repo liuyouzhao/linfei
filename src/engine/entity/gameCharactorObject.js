@@ -1,6 +1,6 @@
 class GameCharactorObject extends GameMovableObject {
   constructor(id, x, y) {
-    super.constructor(id, x, y);
+    super(id, x, y);
     this.health = 100;
     this.state = "stand";
   }

@@ -1,6 +1,8 @@
-class GameAnimationObject extends GameMovableObject {
+class AnimationObject {
   constructor(id, x, y, ticks, frames) {
-    super.constructor(id, x, y);
+    this.id = id;
+    this.x = x;
+    this.y = y;
     this.ticks = ticks;
     this.frames = frames;
     this.currentFrame = 0;

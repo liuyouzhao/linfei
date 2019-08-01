@@ -1,123 +1,86 @@
 class Charactor {
-  constructor() {
-    this.blood = 100;
-    this.speed = Config.getParam("charactorSpeed", 0);
-    /// 0 is x dir, 0-2*PI, unclockwise
-    this.dir = 0;
-    this._bodySize = Config.getParam("charactorSize", 0);
-    this.box = {};
-    this.box.leftTop = new Vec2(0, 0);
-    this.box.rightBottom = new Vec2(this._bodySize, this._bodySize);
-    this.pedestrian = null;
+  constructor(id, engine) {
     this.x = 0;
     this.y = 0;
-    this.body = new DiscObject({ center: new Vec2(0, 0), radius: Config.getParam("charactorSize", 0) / 2 });
-    this.head = new DiscObject({ center: new Vec2(0, 0), radius: Config.getParam("charactorSize", 0) / 4 });
-  }
+    this.id = id;
+    this.engine = engine;
+    this.turnSpeed = Config.getParam("charactorTurnSpeed", 0);
+    this.size = Config.getParam("charactorSize", 0);
+    this.charactor = new GameCharactorObject(id + "_gameObject", this.x, this.y);
+    this.charactor.setSpeed(Config.getParam("charactorSpeed", 0));
+    this.charactorRender = new RenderRingObject(id + "_renderObject", this.x, this.y, this.size, 1, 0, this.size * 0.4);
+    engine.bindGameRenderEffect(this.charactor, this.charactorRender, engine.getEffect("light-effect"));
 
-  bindPedestrian(pd) {
-    this.pedestrian = pd;
-    this.pedestrian.setCharactorBox(this.box);
-  }
+    this.charactorLight = new GameLightObject("charactor-light", this.x, this.y, Config.getParam("charactorFlashPower", 0));
+    this.renderCharactorLight = new RenderLightObject("render-charactor-light",
+                                  this.x, this.y, this.charactorLight.getVolt(), 0.3, 0, 0.76, "#FFFFFFFF", 2.5);
+    engine.bindGameRenderEffect(this.charactorLight, this.renderCharactorLight, engine.getEffect("blank-effect"));
+    engine.getEffect("light-effect").addRenderLight(this.renderCharactorLight);
 
-  setDirection(dir) {
-    this.dir = dir;
-  }
-
-  getBodySize() {
-    return this._bodySize;
-  }
-
-  setLocation(x, y) {
-    if(this.pedestrian != null && this.pedestrian.isBumped(x, y)) {
-      var map = Map.instance();
-      var w = map.width();
-      var h = map.height();
-
-      var fdx1 = 0;
-      var fdx2 = 0;
-      var fdy1 = 0;
-      var fdy2 = 0;
-      var tx = 0;
-      var ty = 0;
-
-      for(var _x = x; _x < w; _x ++, fdx1 ++) {
-        if(this.pedestrian.isBumped(_x, y) == false) {
-          tx = _x;
+    var thiz = this;
+    engine.addGameObjectEventListener(this.charactor, function(name, param, gameObject) {
+      switch(name) {
+        case "onMove": {
+          var tx = thiz.charactor.getDx() * thiz.charactorRender.getR();
+          var ty = thiz.charactor.getDy() * thiz.charactorRender.getR();
+          thiz.charactorLight.move(thiz.charactor.getX() + tx, thiz.charactor.getY() + ty);
           break;
         }
-      }
-      for(var _x = x; _x >= 0; _x --, fdx2 ++) {
-        if(this.pedestrian.isBumped(_x, y) == false) {
-          if(fdx2 < fdx1) {
-            fdx1 = fdx2;
-            tx = _x;
-          }
-          break;
-        }
-      }
-      for(var _y = y; _y < h; _y ++, fdy1 ++) {
-        if(this.pedestrian.isBumped(x, _y) == false) {
-          ty = _y;
-          break;
-        }
-      }
-      for(var _y = y; _y >= 0; _y --, fdy2 ++) {
-        if(this.pedestrian.isBumped(x, _y) == false) {
-          if(fdy2 < fdy1) {
-            fdy1 = fdy2;
-            ty = _y;
-          }
+        case "onChangeAngle": {
+          var tx = thiz.charactor.getDx() * thiz.charactorRender.getR();
+          var ty = thiz.charactor.getDy() * thiz.charactorRender.getR();
+          thiz.charactorLight.move(thiz.charactor.getX() + tx, thiz.charactor.getY() + ty);
+          thiz.charactorLight.setAngle(param);
           break;
         }
       }
 
-      if(fdx1 < fdy1) {
-        x = tx;
-      }
-      else {
-        y = ty;
-      }
-    }
-    this.x = x;
-    this.y = y;
-    this.body.center.x = this.x;
-    this.body.center.y = this.y;
-    this.head.center.x = this.x;
-    this.head.center.y = this.y;
-    this.box.leftTop.x = this.x - 0.5 * this._bodySize;
-    this.box.leftTop.y = this.y - 0.5 * this._bodySize;
-    this.box.rightBottom.x = this.x + 0.5 * this._bodySize;
-    this.box.rightBottom.y = this.y + 0.5 * this._bodySize;
+    });
+  }
+
+  setLightVolt(volt) {
+    this.charactorLight.setVolt(volt);
+  }
+
+  move(x, y) {
+    this.charactor.move(x, y);
+  }
+
+  stand() {
+    this.charactor.stand();
+  }
+
+  getLocation() {
+    return {x:this.charactor.getX(), y:this.charactor.getY()};
+  }
+
+  turn(angle) {
+    this.charactor.setAngle(angle);
   }
 
   forward() {
-    var dx = Math.cos(this.dir) * this.speed;
-    var dy = -Math.sin(this.dir) * this.speed;
-
-    if(this.pedestrian != null) {
-      var spd = this.pedestrian.fixSpeed(dx, dy);
-      dx = spd.x;
-      dy = spd.y;
-    }
-    this.x += dx;
-    this.y += dy;
-    this.body.center.x = this.x;
-    this.body.center.y = this.y;
-    this.head.center.x = this.x + dx * 2;
-    this.head.center.y = this.y + dy * 2;
-    this.box.leftTop.x = this.x - 0.5 * this._bodySize;
-    this.box.leftTop.y = this.y - 0.5 * this._bodySize;
-    this.box.rightBottom.x = this.x + 0.5 * this._bodySize;
-    this.box.rightBottom.y = this.y + 0.5 * this._bodySize;
+    var tx = this.charactor.getDx() * this.charactor.getSpeed();
+    var ty = this.charactor.getDy() * this.charactor.getSpeed();
+    var newxy = this.engine.pedestrainFixSpeed(this.charactorRender.getInnerObject().bounds(), tx, ty);
+    this.charactor.setSpeed(Config.getParam("charactorSpeed", 0));
+    this.charactor.step(newxy.x, newxy.y);
   }
 
-  getForwardLocation(dist) {
-    var dx = Math.cos(this.dir) * dist;
-    var dy = -Math.sin(this.dir) * dist;
-    var location = {};
-    location.x = this.x + dx;
-    location.y = this.y + dy;
-    return location;
+  backward() {
+    var tx = this.charactor.getDx() * this.charactor.getSpeed();
+    var ty = this.charactor.getDy() * this.charactor.getSpeed();
+    var newxy = this.engine.pedestrainFixSpeed(this.charactorRender.getInnerObject().bounds(), tx, ty);
+    this.charactor.setSpeed(Config.getParam("charactorSpeed", 0));
+    this.charactor.step(-newxy.x, -newxy.y);
+  }
+
+  turnLeft() {
+    var angle = this.charactor.getAngle();
+    this.charactor.setAngle(angle + this.turnSpeed);
+  }
+
+  turnRight() {
+    var angle = this.charactor.getAngle();
+    this.charactor.setAngle(angle - this.turnSpeed);
   }
 }

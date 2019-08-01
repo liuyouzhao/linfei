@@ -1,6 +1,6 @@
 class GameRectObject extends GameObject {
   constructor(id, x, y, w, h) {
-    super.constructor(id, x, y);
+    super(id, x, y);
     this.width = w;
     this.height = h;
   }

@@ -4,6 +4,16 @@ class GameObject {
     this.x = x;
     this.y = y;
     this.onEvent = null;
+    this.visible = true;
+  }
+
+  setVisibility(visible) {
+    this.onEvent("onVisibilityChange", visible, this);
+    this.visible = visible;
+  }
+
+  getVisibility() {
+    return this.visible;
   }
 
   getX() {

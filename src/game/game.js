@@ -1,5 +1,5 @@
-class Pipe {
+class Game {
   constructor() {
-
+    
   }
 }

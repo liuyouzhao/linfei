@@ -1,8 +1,7 @@
 class RenderDiscObject extends RenderObject {
   constructor(id, x, y, r) {
-    super.constructor(id, x, y);
-    this.innerObject = new DiscObject(){ center: new Vec2(x, y), radius: r });
-    this.color = "#949494FF";
+    super(id, x, y);
+    this.innerObject = new DiscObject({ center: new Vec2(x, y), radius: r });
   }
 
   move(x, y) {
