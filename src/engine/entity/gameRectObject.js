@@ -12,4 +12,12 @@ class GameRectObject extends GameObject {
   getHeight() {
     return this.height;
   }
+
+  getTopLeft() {
+    return {x:this.x, y:this.y};
+  }
+
+  getBottomRight() {
+    return {x:this.x + this.width, y:this.y + this.height};
+  }
 }

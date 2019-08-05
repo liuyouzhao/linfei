@@ -8,6 +8,11 @@ class RenderObject {
     this.color = "#949494FF";
     this.layer = 0;
     this.visible = true;
+    this.innerObject = new RectangleObject({ topleft: new Vec2(x, y), bottomright: new Vec2(x + this.w, y + this.h) });
+  }
+
+  getBounds() {
+    return this.innerObject.bounds();
   }
 
   getInnerObject() {

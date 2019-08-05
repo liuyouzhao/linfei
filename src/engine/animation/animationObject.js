@@ -11,6 +11,10 @@ class AnimationObject {
     this.started = false;
   }
 
+  setOnEvent(onEvent) {
+    this.onEvent = onEvent;
+  }
+
   getCurrentTick() {
     return this.currentTick;
   }

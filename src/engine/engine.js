@@ -16,6 +16,16 @@ class Engine {
     this.onUpdate = onUpdate;
     this.started = false;
     this.pedestrian = new Pedestrian();
+    this.triggerCenter = new TriggerCenter(this);
+
+    this.__eiEhE = "__engine_inner_Effect-hiddenEffect";
+    this.renderQueues[this.__eiEhE] = new RenderQueue(this);
+    this.effects[this.__eiEhE] = new BlankEffect(this.__eiEhE, this);
+    this.effectIds.push(this.__eiEhE);
+  }
+
+  getTriggerCenter() {
+    return this.triggerCenter;
   }
 
   getEffect(id) {
@@ -35,7 +45,12 @@ class Engine {
     this.eventListeners[gameObject.id] = listener;
   }
 
-  bindGameRenderEffect(gameObject, renderObject, effect, bounding) {
+  addBindGameRenderEffectBounding(gameObject, renderObject, effect, bounding) {
+
+    if(!effect) {
+      effect = new BlankEffect(this.__eiEhE, this);
+    }
+
     this.renderObjects[renderObject.id] = renderObject;
     this.gameObjects[gameObject.id] = gameObject;
     this.gameRenderMap[gameObject.id] = renderObject.id;
@@ -109,6 +124,13 @@ class Engine {
     return visible && inside;
   }
 
+  __visibilityCallbackLatentRender(renderId, engine) {
+    var renderObject = engine.renderObjects[renderId];
+    var inside = engine.viewPort.rectInsideView({x:renderObject.getX(), y:renderObject.getY()},
+                          {x:renderObject.getX() + renderObject.getWidth(), y:renderObject.getY() + renderObject.getHeight()});
+    return inside;
+  }
+
   __visibilityCallbackEffect(renderId, engine) {
     var renderObject = engine.renderObjects[renderId];
     var inside = engine.viewPort.pointInsideView(renderObject.getX(), renderObject.getY());
@@ -136,25 +158,26 @@ class Engine {
   updateEffect() {
     for(var i = 0; i < this.effectIds.length; i ++) {
       var effectId = this.effectIds[i];
-      this.effects[effectId].update(ctx, this.__visibilityCallbackEffect);
+      this.effects[effectId].update(this.ctx, this.__visibilityCallbackEffect);
     }
   }
 
   ignite() {
     this.onUpdate(this);
     this.recalculateRenderLocations();
+    this.triggerCenter.compute(this.ctx, this.__visibilityCallbackLatentRender);
 
     /* Update effect */
     this.updateEffect();
 
     /* Main Rendering */
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    this.ctx.fillStyle = "#000000";
+    this.ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     for(var i = 0; i < this.effectIds.length; i ++) {
       var effectId = this.effectIds[i];
       this.renderQueues[effectId].render(this.ctx, this.__visibilityCallbackRender);
-      this.effects[effectId].render(ctx, this.__visibilityCallbackEffect);
+      this.effects[effectId].render(this.ctx, this.__visibilityCallbackEffect);
     }
 
 
@@ -162,7 +185,7 @@ class Engine {
       for(var i = 0; i < this.renderObjectIds.length; i ++) {
         var renderId = this.renderObjectIds[i];
         var renderObject = this.renderObjects[renderId];
-        renderObject.debugRender(ctx);
+        renderObject.debugRender(this.ctx);
       }
     }
   }

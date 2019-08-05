@@ -9,12 +9,12 @@ class Charactor {
     this.charactor = new GameCharactorObject(id + "_gameObject", this.x, this.y);
     this.charactor.setSpeed(Config.getParam("charactorSpeed", 0));
     this.charactorRender = new RenderRingObject(id + "_renderObject", this.x, this.y, this.size, 1, 0, this.size * 0.4);
-    engine.bindGameRenderEffect(this.charactor, this.charactorRender, engine.getEffect("light-effect"));
+    engine.addBindGameRenderEffectBounding(this.charactor, this.charactorRender, engine.getEffect("light-effect"));
 
     this.charactorLight = new GameLightObject("charactor-light", this.x, this.y, Config.getParam("charactorFlashPower", 0));
     this.renderCharactorLight = new RenderLightObject("render-charactor-light",
                                   this.x, this.y, this.charactorLight.getVolt(), 0.3, 0, 0.76, "#FFFFFFFF", 2.5);
-    engine.bindGameRenderEffect(this.charactorLight, this.renderCharactorLight, engine.getEffect("blank-effect"));
+    engine.addBindGameRenderEffectBounding(this.charactorLight, this.renderCharactorLight, engine.getEffect("blank-effect"));
     engine.getEffect("light-effect").addRenderLight(this.renderCharactorLight);
 
     var thiz = this;
@@ -37,6 +37,13 @@ class Charactor {
 
     });
   }
+
+  getRenderObject() {
+    return this.charactorRender;
+  }
+
+  getX() {  return this.x;  }
+  getY() {  return this.y;  }
 
   setLightVolt(volt) {
     this.charactorLight.setVolt(volt);

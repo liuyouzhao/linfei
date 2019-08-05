@@ -1,0 +1,2 @@
+class TimeTrigger extends Trigger {
+}
