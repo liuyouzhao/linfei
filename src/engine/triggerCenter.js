@@ -4,6 +4,7 @@ class TriggerCenter {
     this.triggers = {};
     this.triggerers = [];
     this.engine = engine;
+    this.outterTriggerCallback = null;
   }
 
   addTrigger(trigger) {
@@ -17,6 +18,10 @@ class TriggerCenter {
   */
   addTriggerer(triggerer) {
     this.triggerers.push(triggerer);
+  }
+
+  setTriggerDispathHandler(onTrigger) {
+    this.outterTriggerCallback = onTrigger;
   }
 
   compute(ctx, isVisible) {
@@ -38,5 +43,8 @@ class TriggerCenter {
 
   onTriggered(id, event, triggerer) {
     console.log("Trigger: ", id, event);
+    if(this.outterTriggerCallback != null) {
+      this.outterTriggerCallback(this.engine);
+    }
   }
 }

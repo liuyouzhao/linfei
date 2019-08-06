@@ -1,6 +1,42 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 var playerCharactor = null;
+var sound;
+var audioPlayer;
+var keySound1 = "./res/sounds/monster_001.mp3";
+
+function initAudio() {
+  // Make sure the AudioPlayer API is available.
+  if (window.AudioPlayer === undefined) {
+    setStatus("Sorry, your web browser cannot run this demo");
+    return
+  }
+  audioPlayer = new AudioPlayer();
+
+	audioPlayer.onloadstart = function() {
+		window.console.debug("Loading.");
+	}
+
+  audioPlayer.onloaderror = function() {
+		if (audioPlayer.errorType === audioPlayer.IO_ERROR) {
+			setStatus("Sorry, the demo resource files failed to load");
+		} else if (player.errorType === audioPlayer.DECODING_ERROR) {
+			setStatus("Sorry, your web browser cannot run this demo");
+		}
+		window.console.debug(audioPlayer.errorText);
+	}
+
+  audioPlayer.onloadcomplete = function() {
+    window.console.debug("Loaded.");
+
+    audioPlayer.onloadstart = null;
+    audioPlayer.onloaderror = null;
+    audioPlayer.onloadcomplete = null;
+
+    sound = audioPlayer.create(keySound1);
+  }
+  audioPlayer.load(keySound1);
+}
 
 var controller = {};
 var walls = [];
@@ -23,9 +59,23 @@ function onUpdate(engine) {
   var location = playerCharactor.getLocation();
   engine.moveCamera(location.x, location.y);
 
-  /* Judge visibility */
-  for(var i = 0; i < walls.length; i ++) {
-    //walls[i].setVisibility(false);
+  if(sound) {
+    var soundPositionObject = engine.findRoById("trigger-area-renderrect-001");
+    var spx = soundPositionObject.getX() + soundPositionObject.getWidth() * 0.5;
+    var spy = soundPositionObject.getY() + soundPositionObject.getHeight() * 0.5;
+    var cx = canvas.width * 0.5;
+    var cy = canvas.height * 0.5;
+    var _x = spx - cx;
+    var _y = spy - cy;
+    var dist = _x*_x + _y*_y;
+    var fadeParam = 160000;
+    if(dist < fadeParam) dist = fadeParam;
+    audioPlayer.setX(sound, _x);
+    audioPlayer.setZ(sound, _y);
+    audioPlayer.setVolume(fadeParam / dist);
+    if(audioPlayer.isPlaying(sound) == false) {
+      audioPlayer.play(sound, false);
+    }
   }
 
 }
@@ -89,6 +139,8 @@ function createWorld(engine) {
 
   engine.getTriggerCenter().addTriggerer(playerCharactor.getRenderObject());
 
+  initAudio();
+
   document.addEventListener('keydown', function(key) {
     switch(key.code) {
       case "ArrowUp": {
@@ -138,4 +190,6 @@ function main() {
   createWorld(engine);
   engine.start();
 }
-main();
+function onUserGesture() {
+  main();
+}

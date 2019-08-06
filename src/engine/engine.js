@@ -101,6 +101,14 @@ class Engine {
     return this.gameObjects[this.renderGameMap[roId]];
   }
 
+  findRoById(roId) {
+    return this.renderObjects[roId];
+  }
+
+  findGoById(goId) {
+    return this.gameObjects[goId];
+  }
+
   onGameObjectEvent(name, param, gameObject) {
     var renderObjectId = this.gameRenderMap[gameObject.id];
     var renderObject = this.renderObjects[renderObjectId];
